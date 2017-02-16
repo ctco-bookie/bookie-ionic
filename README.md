@@ -11,6 +11,10 @@ Tested on nodejs 6.9.5
 Starting the local environment for dev/testing:
 `ionic serve`
 
+Adding platforms:
+iOS: `ionic platform add ios`
+Android: `ionic platform add android`
+
 Running on iOS emulator:
 `ionic run ios --emulator`
 
