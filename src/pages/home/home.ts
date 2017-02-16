@@ -34,7 +34,13 @@ export class HomePage {
     this.rooms = result.roomsOnFloor;
     this.availabilityFilter = 'available';
     this.showAvailableRooms();
-    Vibration.vibrate(1000); //Vibration added to check integration with native functionality
+    //Vibration added to check integration with native functionality
+    try {
+      Vibration.vibrate(1000)
+    }
+    catch(e) {
+      console.log('Vibration failed: '+ (<Error>e).message);
+    }; 
   }
 
   showAvailableRooms() {

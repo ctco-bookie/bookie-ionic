@@ -8,12 +8,11 @@ Tested on nodejs 6.9.5
 ` yarn install `
 
 ##Running the app
+Getting the plugins and platforms installed:
+`ionic state restore`
+
 Starting the local environment for dev/testing:
 `ionic serve`
-
-Adding platforms:
-iOS: `ionic platform add ios`
-Android: `ionic platform add android`
 
 Running on iOS emulator:
 `ionic run ios --emulator`
