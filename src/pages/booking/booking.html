@@ -1,0 +1,32 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Book {{room.name}}</ion-title>
+  </ion-navbar>
+</ion-header>
+
+
+<ion-content>
+  <ion-list radio-group [(ngModel)]="time">
+    <ion-item>
+      <ion-label>15 minutes</ion-label>
+      <ion-radio value="15"></ion-radio>
+    </ion-item>
+    <ion-item>
+      <ion-label>30 minutes</ion-label>
+      <ion-radio value="30"></ion-radio>
+    </ion-item>
+    <ion-item>
+      <ion-label>45 minutes</ion-label>
+      <ion-radio value="45"></ion-radio>
+    </ion-item>
+    <ion-item>
+      <ion-label>1 hour</ion-label>
+      <ion-radio value="60"></ion-radio>
+    </ion-item>
+    <ion-item>
+      <ion-label>1 hour 30 minutes</ion-label>
+      <ion-radio value="90"></ion-radio>
+    </ion-item>
+  </ion-list>
+  <button id="book" ion-button>BOOK NOW</button>
+</ion-content>

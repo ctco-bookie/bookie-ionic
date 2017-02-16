@@ -1,0 +1,30 @@
+page-home {
+  .circle {
+    width: 10px;
+    height: 10px;
+    -moz-border-radius: 50px;
+    -webkit-border-radius: 50px;
+    border-radius: 50px;
+    display: inline-block;
+  }
+  .green {
+    color: green;
+  }
+  .red {
+    color: red;
+  }
+  .status {
+    margin-right: 5px;
+    vertical-align: middle;
+    height: 24px;
+  }
+
+  ion-card-content {
+    border-bottom: 1px solid #cecece;
+  }
+  
+  .loadingIndicator {
+      text-align: center;
+  }
+
+}

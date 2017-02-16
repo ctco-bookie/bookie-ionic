@@ -1,0 +1,65 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Meeting rooms (#{{roomSelected}})</ion-title>
+    <ion-buttons end>
+      <button ion-button (click)="scanQRCode()" icon-right>
+        QR
+        <ion-icon name="camera"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+  <ion-toolbar>
+    <!--Tab to filter between available/all meeting rooms-->
+    <ion-segment [(ngModel)]="availabilityFilter">
+      <ion-segment-button value="available" (ionSelect)="showAvailableRooms()">
+        Available
+      </ion-segment-button>
+      <ion-segment-button value="all" (ionSelect)="showAllRooms()">
+        All
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>  
+
+  <!--Refresher (slide up to refresh)-->
+  <ion-refresher (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content 
+      pullingIcon="arrow-dropdown"
+      pullingText="Pull to refresh rooms list"
+      refreshingSpinner="crescent"
+      refreshingText="">
+    </ion-refresher-content>
+  </ion-refresher>
+
+  <!--Some text to show, while room list is being loaded -->
+  <ion-card>
+    <ion-card-content class='loadingIndicator' *ngIf="filteredRooms===null">
+      <div>
+        <ion-spinner name="crescent"></ion-spinner>
+      </div>
+      <div>Loading list of meeting rooms</div>
+    </ion-card-content>
+  </ion-card>
+  
+  
+  <!--Displays list of rooms  -->
+  <ion-card *ngFor="let room of filteredRooms">
+    <ion-card-header>
+      {{room.name}} ({{room.number}})
+    </ion-card-header>
+    <ion-card-content>
+      <div>
+        <ion-icon name="person"></ion-icon> {{room.capacity}}</div>
+      <div [ngSwitch]="room.availability.busy">
+        <div *ngSwitchCase="true" class='red'>
+          <ion-icon name="close-circle" class="status red"></ion-icon>Busy. Available from {{room.availability.availableFrom}}</div>
+        <div *ngSwitchCase="false">
+          <ion-icon name="checkmark-circle" class="status green"></ion-icon>Available for {{room.availability.availableFor}}</div>
+      </div>
+    </ion-card-content>
+    <button ion-button class='' clear (click)="openBookingPage(room)"> Book {{room.name}}</button>
+  </ion-card>
+
+</ion-content>
