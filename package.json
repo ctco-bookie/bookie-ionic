@@ -37,7 +37,10 @@
     "cordova-plugin-console",
     "cordova-plugin-device",
     "cordova-plugin-splashscreen",
-    "ionic-plugin-keyboard"
+    "ionic-plugin-keyboard",
+    "cordova-plugin-vibration",
+    "phonegap-plugin-barcodescanner",
+    "cordova-plugin-compat"
   ],
   "cordovaPlatforms": [
     "ios",
@@ -45,6 +48,11 @@
       "platform": "ios",
       "version": "",
       "locator": "ios"
+    },
+    {
+      "platform": "android",
+      "version": "",
+      "locator": "android"
     }
   ],
   "description": "bookie-ionic: An Ionic project"
