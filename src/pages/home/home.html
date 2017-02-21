@@ -35,7 +35,7 @@
 
   <!--Some text to show, while room list is being loaded -->
   <ion-card>
-    <ion-card-content class='loadingIndicator' *ngIf="filteredRooms===null">
+    <ion-card-content class='loadingIndicator' *ngIf="updateInProgress===true">
       <div>
         <ion-spinner name="crescent"></ion-spinner>
       </div>
