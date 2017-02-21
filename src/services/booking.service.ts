@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Http, URLSearchParams, Response } from '@angular/http';
+import { AppConfig } from '../app/app.config';
 
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/observable/throw';
 
 //Implemented for POC purpose. Selected room will not be displayed in results. To be changed to something reasonable.
 const floorMasterRoomNumberQuery = 'query AvailableRoomsQuery($roomNumber: Int!) {  roomsOnFloor: rooms(floorMasterRoomNumber: $roomNumber) {    name    number    capacity    availability {      busy      availableFor      availableFrom      __typename    }    __typename  }}';
@@ -19,7 +21,7 @@ export class BookingService {
         let variables = {"roomNumber": roomSelected};
         params.set('query', floorMasterRoomNumberQuery);
         params.set('variables', JSON.stringify(variables));
-        return this.http.get('http://bookie.ctco.lv/api/graphql', { search: params })
+        return this.http.get(AppConfig.apiEndpoint, { search: params })
             .map(this.extractData)
             .catch(this.handleError);;
     }
@@ -40,7 +42,7 @@ export class BookingService {
             errMsg = error.message ? error.message : error.toString();
         }
         console.error(errMsg);
-        return Observable.throw(errMsg);
+        return Observable.throw('connection error - '+ errMsg);
     }
 
 }

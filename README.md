@@ -7,14 +7,19 @@ Tested on nodejs 6.9.5
 
 ` yarn install `
 
+Create local app.config.ts 
+
 ##Running the app
 Getting the plugins and platforms installed:
+
 `ionic state restore`
 
 Starting the local environment for dev/testing:
+
 `ionic serve`
 
 Running on iOS emulator:
+
 `ionic run ios --emulator`
 
 Running on iOS device:
