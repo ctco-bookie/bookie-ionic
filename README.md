@@ -7,7 +7,7 @@ Tested on nodejs 6.9.5
 
 ` yarn install `
 
-Create local app.config.ts 
+Create 'app.config.ts' (copy from 'app.config.ts.example')  and edit apiEndpoint, if required
 
 ##Running the app
 Getting the plugins and platforms installed:
