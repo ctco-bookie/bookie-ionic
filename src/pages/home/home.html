@@ -51,12 +51,17 @@
     </ion-card-header>
     <ion-card-content>
       <div>
-        <ion-icon name="person"></ion-icon> {{room.capacity}}</div>
+        <ion-icon name="person"></ion-icon> {{room.capacity}}
+      </div>
       <div [ngSwitch]="room.availability.busy">
         <div *ngSwitchCase="true" class='red'>
-          <ion-icon name="close-circle" class="status red"></ion-icon>Busy. Available from {{room.availability.availableFrom}}</div>
+          <ion-icon name="close-circle" class="status red"></ion-icon>
+          Busy. Available from {{room.availability.availableFrom}}
+        </div>
         <div *ngSwitchCase="false">
-          <ion-icon name="checkmark-circle" class="status green"></ion-icon>Available for {{room.availability.availableFor}}</div>
+          <ion-icon name="checkmark-circle" class="status green"></ion-icon>
+          Available for {{room.availability.availableFor}}
+        </div>
       </div>
     </ion-card-content>
     <button ion-button class='' clear (click)="openBookingPage(room)"> Book {{room.name}}</button>
