@@ -37,17 +37,21 @@ export class HomePage {
   }
 
   processData(result: Room[]) {
-    this.rooms = result;
-    this.availabilityFilter = 'available';
-    this.showAvailableRooms();
-    //Vibration added to check integration with native functionality
-    try {
-      Vibration.vibrate(1000)
+    if (typeof result !== 'undefined' && result.length > 0) {
+      this.rooms = result;
+      this.availabilityFilter = 'available';
+      this.showAvailableRooms();
+      //Vibration added to check integration with native functionality
+      try {
+        Vibration.vibrate(1000)
+      }
+      catch(e) {
+        console.log('Vibration failed: '+ (<Error>e).message);
+      };
+      this.updateInProgress = false;
+    } else {
+      this.showError('Could not get list of rooms');
     }
-    catch(e) {
-      console.log('Vibration failed: '+ (<Error>e).message);
-    };
-    this.updateInProgress = false;
   }
 
   showError(err) {
