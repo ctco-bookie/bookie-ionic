@@ -17,6 +17,7 @@ export class HomePage {
   public filteredRooms: any;
   private availabilityFilter: string;
   private roomSelected: number;
+  private updateInProgress: boolean;
 
   constructor(public navCtrl: NavController, private bookingService: BookingService, private alertCtrl: AlertController) {
     this.roomSelected = 412; // "magic" room number
@@ -24,9 +25,13 @@ export class HomePage {
   }
 
   updateRooms() {
+    this.updateInProgress = true;
     this.filteredRooms = null; //toggles "loading" spinner on UI
     this.bookingService.getMeetingRooms(this.roomSelected).subscribe(
-      result => this.processData(result)
+      result => this.processData(result),
+      err => { 
+        this.showError(err);
+      }
     );
   }
 
@@ -40,7 +45,18 @@ export class HomePage {
     }
     catch(e) {
       console.log('Vibration failed: '+ (<Error>e).message);
-    }; 
+    };
+    this.updateInProgress = false;
+  }
+
+  showError(err) {
+    let alert = this.alertCtrl.create({
+      title: 'Error',
+      subTitle: err,
+      buttons: ['Dismiss']
+    });
+    this.updateInProgress = false;
+    return alert.present();
   }
 
   showAvailableRooms() {
@@ -65,33 +81,19 @@ export class HomePage {
 
   // Barcode scanning using native cordova plugin
   scanQRCode() {
-    BarcodeScanner.scan().then((barcodeData) => {
-      let url = JSON.stringify(barcodeData.text);
-      if (url.includes("http://bookie.ctco.lv/room/")) {
-        let roomNumber = Number(url.substr(28, 3));
-        if (roomNumber > 0) {
-          this.roomSelected = roomNumber;
-          this.updateRooms();
-        } else {
-          let alert = this.alertCtrl.create({
-            title: 'Error',
-            subTitle: 'Could not identify room number',
-            buttons: ['Dismiss']
-          });
-          alert.present();
+    BarcodeScanner.scan().then(
+      barcodeData => {
+        let url = JSON.stringify(barcodeData.text);
+        if (url.includes("http://bookie.ctco.lv/room/")) {
+          let roomNumber = Number(url.substr(28, 3));
+          if (roomNumber > 0) {
+            this.roomSelected = roomNumber;
+            this.updateRooms();
+          } else {
+            this.showError('Could not identify room number');
+          }
         }
-      }
-    }, (err) => {
-        // An error occurred
-        let alert = this.alertCtrl.create({
-            title: 'Error',
-            subTitle: 'Unknown error',
-            buttons: ['Dismiss']
-          });
-          alert.present();
-    });
-  }
-
-  
-
+      }, 
+      err => this.showError('Unknown error') 
+    )}
 }
