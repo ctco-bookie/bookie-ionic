@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Http, URLSearchParams, Response } from '@angular/http';
 import { AppConfig } from '../app/app.config';
+import { Room } from '../models/room';
 
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
@@ -16,7 +17,7 @@ export class BookingService {
     constructor(private http: Http) {
     }
 
-    getMeetingRooms(roomSelected: number): Observable<any> {
+    getMeetingRooms(roomSelected: number): Observable<Room[]> {
         let params: URLSearchParams = new URLSearchParams();
         let variables = {"roomNumber": roomSelected};
         params.set('query', floorMasterRoomNumberQuery);
@@ -28,7 +29,7 @@ export class BookingService {
 
     private extractData(res: Response) {
         let body = res.json();
-        return body.data || {};
+        return <Room[]>body.data.roomsOnFloor || {};
     }
 
     private handleError(error: Response | any) {

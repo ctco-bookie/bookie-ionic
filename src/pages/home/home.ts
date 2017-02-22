@@ -1,3 +1,4 @@
+import { Room } from '../../models/room';
 import { BookingService } from '../../services/booking.service';
 import { Component, ViewChild } from '@angular/core';
 import { Content, NavController, AlertController } from 'ionic-angular';
@@ -13,8 +14,8 @@ export class HomePage {
 
   @ViewChild(Content) content: Content;
 
-  public rooms: any;
-  public filteredRooms: any;
+  private rooms: Room[];
+  public filteredRooms: Room[];
   private availabilityFilter: string;
   private roomSelected: number;
   private updateInProgress: boolean;
@@ -35,8 +36,8 @@ export class HomePage {
     );
   }
 
-  processData(result) {
-    this.rooms = result.roomsOnFloor;
+  processData(result: Room[]) {
+    this.rooms = result;
     this.availabilityFilter = 'available';
     this.showAvailableRooms();
     //Vibration added to check integration with native functionality
@@ -74,10 +75,9 @@ export class HomePage {
     refresher.complete();
   }
   
-  openBookingPage(room) {
-    this.navCtrl.push(BookingPage, { room: room });
+  openBookingPage(room: Room) {
+    this.navCtrl.push(BookingPage, {room});
   }
-
 
   // Barcode scanning using native cordova plugin
   scanQRCode() {

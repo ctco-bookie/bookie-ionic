@@ -1,3 +1,4 @@
+import { Room } from '../../models/room';
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 
@@ -7,7 +8,7 @@ import { NavController, NavParams } from 'ionic-angular';
 })
 export class BookingPage {
   
-  room: any;
+  room: Room;
   time: any;
 
   constructor(public navCtrl: NavController, private navParams: NavParams) {
