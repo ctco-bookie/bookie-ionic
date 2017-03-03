@@ -1,9 +1,31 @@
+import { Subject, Subscription } from 'rxjs/Rx';
+import { Apollo, ApolloQueryObservable } from 'apollo-angular';
 import { Room } from '../../models/room';
-import { BookingService } from '../../services/booking.service';
 import { Component, ViewChild } from '@angular/core';
 import { Content, NavController, AlertController } from 'ionic-angular';
 import { BookingPage } from '../booking/booking';
 import { Vibration, BarcodeScanner } from 'ionic-native';
+
+import gql from 'graphql-tag';
+
+const floorMasterRoomNumberQuery = gql`
+        query AvailableRoomsQuery($roomNumber: Int!) 
+        {  roomsOnFloor: rooms(floorMasterRoomNumber: $roomNumber) {    
+            name
+            number
+            capacity
+            availability {
+                busy
+                availableFor
+                availableFrom
+            }
+        }
+    }`
+  ;
+
+interface QueryResponse {
+  roomsOnFloor: Room[];
+}
 
 @Component({
   selector: 'page-home',
@@ -13,47 +35,57 @@ import { Vibration, BarcodeScanner } from 'ionic-native';
 export class HomePage {
 
   @ViewChild(Content) content: Content;
+  roomsObs: ApolloQueryObservable<any>;
+  rooms: Room[] = [];
+  filteredRooms: Room[] = [];
+  availabilityFilter: string;
+  floorMasterRoomNumber: Subject<number> = new Subject<number>();
+  updateInProgress: boolean;
+  roomSelected: number;
+  roomsSubscription: Subscription;
 
-  private rooms: Room[];
-  public filteredRooms: Room[];
-  private availabilityFilter: string;
-  private roomSelected: number;
-  private updateInProgress: boolean;
+  constructor(
+    public navCtrl: NavController, 
+    private apollo: Apollo, 
+    private alertCtrl: AlertController
+    ){} 
 
-  constructor(public navCtrl: NavController, private bookingService: BookingService, private alertCtrl: AlertController) {
-    this.roomSelected = 412; // "magic" room number
-    this.updateRooms();
-  }
-
-  updateRooms() {
+  //Ionic's alternative to ngOnInit()
+  ionViewWillEnter() {  
+    this.roomSelected = 412; //Magic room number - to be substituted with config
     this.updateInProgress = true;
-    this.filteredRooms = null; //toggles "loading" spinner on UI
-    this.bookingService.getMeetingRooms(this.roomSelected).subscribe(
-      result => this.processData(result),
-      err => { 
-        this.showError(err);
-      }
+
+    this.roomsObs = this.apollo.watchQuery<any>({
+      query: floorMasterRoomNumberQuery,
+      variables: {roomNumber: this.roomSelected}
+      });
+    
+    this.roomsSubscription = this.roomsObs.subscribe(
+      res => {
+        this.processData(res)
+        this.updateInProgress = false;
+      },
+      err => this.rooms = []
     );
   }
-
-  processData(result: Room[]) {
-    if (typeof result !== 'undefined' && result.length > 0) {
-      this.rooms = result;
-      this.availabilityFilter = 'available';
-      this.showAvailableRooms();
-      //Vibration added to check integration with native functionality
-      try {
-        Vibration.vibrate(1000)
-      }
-      catch(e) {
-        console.log('Vibration failed: '+ (<Error>e).message);
-      };
-      this.updateInProgress = false;
-    } else {
-      this.showError('Could not get list of rooms');
-    }
+  
+  //Ionic's alternative to ngOnInit()
+  ionViewDidLeave() { 
+    this.roomsSubscription.unsubscribe();
   }
 
+  //Update rooms list, apply default filter, drop "sync in progress"
+  processData(res, refresher?) {
+    this.rooms = res.data.roomsOnFloor || []; 
+    this.availabilityFilter = 'available';
+    this.updateInProgress = false;
+    this.showAvailableRooms();
+    if (refresher !== undefined) {
+      refresher.complete();
+    }
+  }
+  
+  //Alert modal window
   showError(err) {
     let alert = this.alertCtrl.create({
       title: 'Error',
@@ -74,13 +106,23 @@ export class HomePage {
     this.content.scrollToTop();
   }
 
+
+  //Refresh spinner 
   doRefresh(refresher) {
-    this.updateRooms();
-    refresher.complete();
+    this.rooms = [];
+    this.filteredRooms = [];
+    this.roomsObs.refetch()
+      .then(res => {
+        this.processData(res, refresher);
+      })
+      .catch(err => { 
+        this.showError(err); 
+        refresher.complete() 
+      });
   }
-  
+
   openBookingPage(room: Room) {
-    this.navCtrl.push(BookingPage, {room});
+    this.navCtrl.push(BookingPage, { room });
   }
 
   // Barcode scanning using native cordova plugin
@@ -92,12 +134,26 @@ export class HomePage {
           let roomNumber = Number(url.substr(28, 3));
           if (roomNumber > 0) {
             this.roomSelected = roomNumber;
-            this.updateRooms();
+            this.roomsObs.refetch({roomNumber: roomNumber});
           } else {
             this.showError('Could not identify room number');
           }
         }
-      }, 
-      err => this.showError('Unknown error') 
-    )}
+      },
+      err => {
+        this.showError('Unknown error');
+      }
+    )
+  }
+
+  //Vibration added to check integration with native functionality
+  vibrate() {
+    try {
+      Vibration.vibrate(1000)
+    }
+    catch (e) {
+      console.log('Vibration failed: ' + (<Error>e).message);
+    };
+  }
+  
 }
